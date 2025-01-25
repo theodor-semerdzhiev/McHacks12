@@ -1,0 +1,261 @@
+/* Intro / Hero Section */
+.intro-section {
+  width: 100%;           /* Full browser width */
+  background-color: #fff;
+  padding: 2rem 0;       /* top/bottom spacing */
+  margin-bottom: 2rem;   /* space before the main-content */
+}
+
+.intro-content {
+  max-width: 1400px;     /* Center within the page */
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+  padding: 0 1rem;       /* side padding */
+}
+
+.intro-text {
+  flex: 1;               /* Let text grow/shrink */
+  min-width: 300px;
+}
+
+.intro-text h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.intro-text p {
+  text-align: left;      /* Keep paragraphs left-aligned */
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.intro-image {
+  flex: 1;               
+  min-width: 300px;
+  text-align: center;
+}
+
+.intro-image img {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Reset & Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: #f0f2f5;
+  color: #333;
+}
+
+/* -----------------------------------------
+   HEADER / NAV / FOOTER
+----------------------------------------- */
+
+/* If you're using a "site-header" approach: */
+.site-header {
+  background: #233046; /* Deep blue */
+  color: #ffffff;
+  padding: 1rem 2rem;
+  text-align: center;
+}
+
+/* Logo in site-header */
+.logo {
+  font-weight: bold;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+/* If you're using a "navbar" approach instead: */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #233046;
+  padding: 1rem 2rem;
+}
+
+/* Left portion of navbar */
+.nav-left h2 {
+  color: #fff;
+  margin: 0;
+}
+
+/* Right portion of navbar with links */
+.nav-right a {
+  margin-left: 1rem;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+.nav-right a:hover {
+  text-decoration: underline;
+}
+
+/* Footer */
+footer {
+  background: #233046;
+  color: #ffffff;
+  text-align: center;
+  padding: 1rem;
+  margin-top: 2rem;
+  border-radius: 8px;
+}
+
+/* -----------------------------------------
+   MAIN CONTENT & LAYOUT
+----------------------------------------- */
+
+/* Main content container */
+.main-content {
+  max-width: 1400px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart section */
+.chart-section {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+/* Chart controls */
+.chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+/* -----------------------------------------
+   FORMS / INPUTS / BUTTONS
+----------------------------------------- */
+
+select, 
+input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #233046; /* color for the check on modern browsers */
+}
+
+/* Button Styles */
+button {
+  padding: 0.8rem 1.2rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-color: #233046; /* Deep blue */
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #2f405e; /* Slightly lighter blue */
+  border-color: #a0a4aa; /* Expand gray ring */
+  box-shadow: 0 0 10px rgba(160, 164, 170, 0.5);
+}
+
+button:focus {
+  outline: none;
+  border-color: #a0a4aa;
+  box-shadow: 0 0 5px rgba(160, 164, 170, 0.8);
+}
+
+/* -----------------------------------------
+   TYPOGRAPHY
+----------------------------------------- */
+h1, 
+h2, 
+h3, 
+p {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+.mt-2 {
+  margin-top: 2rem;
+}
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
+/* Interactive box shadow hover */
+.interactive {
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+.interactive:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* -----------------------------------------
+   STATISTICAL PAGE LAYOUT
+----------------------------------------- */
+
+/* Two-column container for Statistical Approach page */
+.stat-container {
+  display: flex;
+  gap: 2rem;
+}
+
+/* Left column with images */
+.stat-left {
+  flex: 1;
+  background: #fafafa;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+/* Right column with checkboxes & AI summary */
+.stat-right {
+  flex: 1;
+  background: #fafafa;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Image styling */
+.stat-image {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
