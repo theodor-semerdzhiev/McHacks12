@@ -48,7 +48,7 @@ class PairWiseMomentumStrategy():
         return "Hold", 0
     
 
-    def _calculate_momentum_1hr(self, stock_series:pd.Series):
+    def _calculate_momentum_15sec(self, stock_series:pd.Series):
         if len(stock_series) < 2:
             return np.nan
         
@@ -68,8 +68,8 @@ class PairWiseMomentumStrategy():
         if len(stock1_data) < lookback_periods or len(stock2_data) < lookback_periods:
             return None
 
-        stock1_momentum = self._calculate_momentum_1hr(stock1_data[-lookback_periods:])
-        stock2_momentum = self._calculate_momentum_1hr(stock2_data[-lookback_periods:])
+        stock1_momentum = self._calculate_momentum_15sec(stock1_data[-lookback_periods:])
+        stock2_momentum = self._calculate_momentum_15sec(stock2_data[-lookback_periods:])
         signal, stock_num = self._check_signal(stock1_momentum, stock2_momentum)
 
         if signal in ['Long', 'Short']:
