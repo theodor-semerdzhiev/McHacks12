@@ -16,6 +16,7 @@ import {
 import { Line } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
 
+// Register Chart.js + Zoom
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -29,163 +30,117 @@ ChartJS.register(
 );
 
 export default function HomePage() {
-  // We'll still track "period" and "stocks" as before
+  // "market" or "trade"
+  const [dataType, setDataType] = useState("trade"); 
+  // Which period is selected
   const [period, setPeriod] = useState("Period1");
+  // Which stocks (A–E) are selected
   const [selectedStocks, setSelectedStocks] = useState(["A"]);
+  // Final array of chart data, one entry per stock
   const [chartsData, setChartsData] = useState([]);
 
-  // Now let's also track which fields we want to plot:
-  // For example: 'bidPrice', 'askPrice', 'bidVolume', 'askVolume'
-  // The user could select them from checkboxes or something
-  const [plotBidPrice, setPlotBidPrice] = useState(true);
-  const [plotAskPrice, setPlotAskPrice] = useState(true);
-  const [plotBidVolume, setPlotBidVolume] = useState(false);
-  const [plotAskVolume, setPlotAskVolume] = useState(false);
-
+  // Just an example of 15 periods
   const periods = Array.from({ length: 15 }, (_, i) => `Period${i + 1}`);
+  // Our 5 stocks
   const stockOptions = ["A", "B", "C", "D", "E"];
 
-  // We'll define a chunkFileCount for each stock/period. 
-  // For instance if we know each stock has up to 5 chunk files: 0..4
-  const chunkFileCount = 10; // adjust as needed
-
-  // We'll define a STEP for sampling lines
-  const STEP = 500; // bigger skip to handle huge data
+  // If you have up to e.g. 5 chunked files for market data (0..4), set this to 5 or 6
+  // We'll attempt each one; if it 404s, we skip it.
+  const chunkFileCount = 5;
+  // Sampling step: skip lines to avoid huge chart loads
+  const STEP = 25;
 
   useEffect(() => {
-    // If no stocks selected, no chart
+    // If no stocks selected, clear out
     if (selectedStocks.length === 0) {
       setChartsData([]);
       return;
     }
 
-    // We'll fetch multiple chunk files for each selected stock
-    // Combine them, then sample
-    const fetchAllPromises = selectedStocks.map(async (stock) => {
-      let allRows = [];
-
-      // Suppose we have up to 'chunkFileCount' CSVs: market_data_<stock>_0.csv ... _4.csv
-      for (let i = 0; i < chunkFileCount; i++) {
-        const csvPath = `/TrainingData/${period}/${period}/${stock}/market_data_${stock}_${i}.csv`;
-
-        // We'll attempt to parse each chunk file. If it doesn't exist,
-        // we might get a 404. We'll handle that by ignoring or breaking out.
-        try {
-          const result = await parseCsv(csvPath);
-          if (result && result.length > 0) {
-            allRows = allRows.concat(result);
-          } else {
-            // If it's null or empty, likely no more chunk files exist
-            // break the loop if you prefer
-            // break;
+    // Build array of Promises for each stock
+    const fetchAll = selectedStocks.map(async (stock) => {
+      if (dataType === "market") {
+        // MARKET DATA -> chunked approach
+        let allRows = [];
+        for (let i = 0; i < chunkFileCount; i++) {
+          const csvPath = `/TrainingData/${period}/${period}/${stock}/market_data_${stock}_${i}.csv`;
+          try {
+            const rows = await parseCsv(csvPath);
+            if (rows.length > 0) {
+              allRows = allRows.concat(rows);
+            }
+          } catch (err) {
+            // 404 or parse error => skip
           }
-        } catch (error) {
-          console.warn("Error parsing chunk file", csvPath, error);
-          // Possibly break if you know no more files exist
-          // break;
         }
-      }
+        // If we never found any rows, skip
+        if (allRows.length === 0) return null;
 
-      // Now 'allRows' includes all lines from all chunk files
-      // Next, heavily sample them
-      const sampled = allRows.filter((_, idx) => idx % STEP === 0);
+        // Sample
+        const sampled = allRows.filter((_, idx) => idx % STEP === 0);
 
-      // Convert strings -> numbers
-      const parsedData = sampled.map((row) => ({
-        timestamp: row.timestamp,
-        bidPrice: parseFloat(row.bidPrice),
-        askPrice: parseFloat(row.askPrice),
-        bidVolume: parseFloat(row.bidVolume),
-        askVolume: parseFloat(row.askVolume),
-      }));
-
-      return { stock, parsedData };
-    });
-
-    Promise.all(fetchAllPromises).then((stockResults) => {
-      // Filter out any that are null or empty
-      const valid = stockResults.filter((s) => s && s.parsedData && s.parsedData.length > 0);
-
-      // Now build a separate chart for each stock
-      const newCharts = valid.map(({ stock, parsedData }) => {
-        // Build labels from timestamps
-        const labels = parsedData.map((item) => item.timestamp);
-
-        const datasets = [];
-
-        // If user wants bidPrice:
-        if (plotBidPrice) {
-          datasets.push({
-            type: "line",
-            label: `Bid Price (${stock})`,
-            data: parsedData.map((item) => item.bidPrice),
-            borderColor: "rgb(75, 192, 192)",
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
-            yAxisID: "yPrice",
-            tension: 0.2,
-            order: 1,
-          });
-        }
-
-        // If user wants askPrice:
-        if (plotAskPrice) {
-          datasets.push({
-            type: "line",
-            label: `Ask Price (${stock})`,
-            data: parsedData.map((item) => item.askPrice),
-            borderColor: "rgb(192, 75, 192)",
-            backgroundColor: "rgba(192, 75, 192, 0.2)",
-            yAxisID: "yPrice",
-            tension: 0.2,
-            order: 1,
-          });
-        }
-
-        // If user wants bidVolume:
-        if (plotBidVolume) {
-          datasets.push({
-            type: "bar",
-            label: `Bid Volume (${stock})`,
-            data: parsedData.map((item) => item.bidVolume),
-            borderColor: "rgb(192, 75, 75)",
-            backgroundColor: "rgba(192, 75, 75, 0.5)",
-            yAxisID: "yVolume",
-            order: 0,
-          });
-        }
-
-        // If user wants askVolume:
-        if (plotAskVolume) {
-          datasets.push({
-            type: "bar",
-            label: `Ask Volume (${stock})`,
-            data: parsedData.map((item) => item.askVolume),
-            borderColor: "rgb(75, 75, 192)",
-            backgroundColor: "rgba(75, 75, 192, 0.5)",
-            yAxisID: "yVolume",
-            order: 0,
-          });
-        }
+        // Convert to numeric
+        const parsedData = sampled
+          .filter(
+            (r) =>
+              r.bidPrice &&
+              r.askPrice &&
+              r.bidVolume &&
+              r.askVolume &&
+              r.timestamp
+          )
+          .map((r) => ({
+            timestamp: r.timestamp,
+            bidPrice: parseFloat(r.bidPrice),
+            askPrice: parseFloat(r.askPrice),
+            bidVolume: parseFloat(r.bidVolume),
+            askVolume: parseFloat(r.askVolume),
+          }));
+        if (parsedData.length === 0) return null;
 
         return {
           stock,
-          chartData: { labels, datasets },
+          chartData: buildMarketChartData(parsedData),
         };
-      });
 
-      setChartsData(newCharts);
+      } else {
+        // TRADE DATA -> single file
+        // e.g. /TrainingData/Period1/Period1/A/trade_data__A.csv
+        const csvPath = `/TrainingData/${period}/${period}/${stock}/trade_data__${stock}.csv`;
+        try {
+          const allRows = await parseCsv(csvPath);
+          if (allRows.length === 0) return null;
+
+          const sampled = allRows.filter((_, idx) => idx % STEP === 0);
+
+          const parsedData = sampled
+            .filter((r) => r.price && r.volume && r.timestamp)
+            .map((r) => ({
+              timestamp: r.timestamp,
+              price: parseFloat(r.price),
+              volume: parseInt(r.volume, 10),
+            }));
+          if (parsedData.length === 0) return null;
+
+          return {
+            stock,
+            chartData: buildTradeChartData(parsedData),
+          };
+        } catch (err) {
+          // e.g. file not found
+          return null;
+        }
+      }
     });
-  }, [
-    period, 
-    selectedStocks, 
-    plotBidPrice, 
-    plotAskPrice, 
-    plotBidVolume, 
-    plotAskVolume
-  ]);
 
-  // Helper function to parse a CSV using Papa
-  // Returns an array of row objects
+    // Wait for all stocks
+    Promise.all(fetchAll).then((results) => {
+      const valid = results.filter((r) => r && r.chartData);
+      setChartsData(valid);
+    });
+  }, [dataType, period, selectedStocks]);
+
+  // Papa Parse helper
   function parseCsv(path) {
     return new Promise((resolve, reject) => {
       Papa.parse(path, {
@@ -198,30 +153,100 @@ export default function HomePage() {
           }
           resolve(results.data);
         },
-        error: (err) => {
-          reject(err);
+        error: (error) => {
+          reject(error);
         },
       });
     });
   }
 
-  // Base chart options, similar to your code
-  function getBaseChartOptions() {
+  // Build chart data for Market CSV (bid/ask)
+  function buildMarketChartData(parsed) {
+    const labels = parsed.map((d) => d.timestamp);
+    return {
+      labels,
+      datasets: [
+        {
+          type: "line",
+          label: "Bid Price",
+          data: parsed.map((d) => d.bidPrice),
+          borderColor: "rgb(75, 192, 192)",
+          backgroundColor: "rgba(75, 192, 192, 0.2)",
+          yAxisID: "yPrice",
+          tension: 0.2,
+          order: 1,
+        },
+        {
+          type: "line",
+          label: "Ask Price",
+          data: parsed.map((d) => d.askPrice),
+          borderColor: "rgb(192, 75, 192)",
+          backgroundColor: "rgba(192, 75, 192, 0.2)",
+          yAxisID: "yPrice",
+          tension: 0.2,
+          order: 1,
+        },
+        {
+          type: "bar",
+          label: "Bid Volume",
+          data: parsed.map((d) => d.bidVolume),
+          borderColor: "rgb(192, 75, 75)",
+          backgroundColor: "rgba(192, 75, 75, 0.5)",
+          yAxisID: "yVolume",
+          order: 0,
+        },
+        {
+          type: "bar",
+          label: "Ask Volume",
+          data: parsed.map((d) => d.askVolume),
+          borderColor: "rgb(75, 75, 192)",
+          backgroundColor: "rgba(75, 75, 192, 0.5)",
+          yAxisID: "yVolume",
+          order: 0,
+        },
+      ],
+    };
+  }
+
+  // Build chart data for Trade CSV (price/volume)
+  function buildTradeChartData(parsed) {
+    const labels = parsed.map((d) => d.timestamp);
+    return {
+      labels,
+      datasets: [
+        {
+          type: "line",
+          label: "Price",
+          data: parsed.map((d) => d.price),
+          borderColor: "rgb(75, 192, 192)",
+          backgroundColor: "rgba(75, 192, 192, 0.2)",
+          yAxisID: "yPrice",
+          tension: 0.2,
+          order: 1,
+        },
+        {
+          type: "bar",
+          label: "Volume",
+          data: parsed.map((d) => d.volume),
+          borderColor: "rgb(192, 75, 75)",
+          backgroundColor: "rgba(192, 75, 75, 0.5)",
+          yAxisID: "yVolume",
+          order: 0,
+        },
+      ],
+    };
+  }
+
+  function getBaseChartOptions(stock) {
     return {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         zoom: {
           zoom: {
-            wheel: {
-              enabled: true,
-              speed: 0.1,
-            },
-            pinch: {
-              enabled: true,
-              speed: 0.1,
-            },
-            mode: "x",
+            wheel: { enabled: true, speed: 0.1 },
+            pinch: { enabled: true, speed: 0.1 },
+            mode: "x", // or "x" / "y"
           },
           pan: {
             enabled: true,
@@ -229,64 +254,50 @@ export default function HomePage() {
             mode: "x",
           },
         },
-        legend: {
-          position: "bottom",
+        legend: { position: "bottom" },
+        title: {
+          display: true,
+          text: `Period: ${period} - Stock: ${stock} - ${
+            dataType === "market" ? "Market Data" : "Trade Data"
+          }`,
         },
       },
       scales: {
         x: {
-          title: {
-            display: true,
-            text: "Timestamp",
+          title: { display: true, text: "Timestamp" },
+          ticks: {
+            autoSkip: true,
+            maxTicksLimit: 20,
           },
         },
         yPrice: {
           type: "linear",
           position: "left",
-          title: {
-            display: true,
-            text: "Price",
-          },
+          title: { display: true, text: "Price" },
         },
         yVolume: {
           type: "linear",
           position: "right",
-          title: {
-            display: true,
-            text: "Volume",
-          },
-          grid: {
-            drawOnChartArea: false,
-          },
+          title: { display: true, text: "Volume" },
+          grid: { drawOnChartArea: false },
         },
       },
     };
   }
 
+  // Renders each chart for each stock
   function StockChart({ stock, chartData }) {
     const chartRef = useRef(null);
-    const options = {
-      ...getBaseChartOptions(),
-      plugins: {
-        ...getBaseChartOptions().plugins,
-        title: {
-          display: true,
-          text: `Period: ${period} - Stock: ${stock}`,
-        },
-      },
-    };
+    const options = getBaseChartOptions(stock);
 
     const handleZoomIn = () => {
-      if (!chartRef.current) return;
-      chartRef.current.zoom(1.1);
+      if (chartRef.current) chartRef.current.zoom(1.1);
     };
     const handleZoomOut = () => {
-      if (!chartRef.current) return;
-      chartRef.current.zoom(0.9);
+      if (chartRef.current) chartRef.current.zoom(0.9);
     };
     const handleResetZoom = () => {
-      if (!chartRef.current) return;
-      chartRef.current.resetZoom();
+      if (chartRef.current) chartRef.current.resetZoom();
     };
 
     return (
@@ -309,6 +320,7 @@ export default function HomePage() {
     );
   }
 
+  // Toggle stock checkboxes
   const handleStockChange = (stock) => {
     if (selectedStocks.includes(stock)) {
       setSelectedStocks(selectedStocks.filter((s) => s !== stock));
@@ -323,27 +335,65 @@ export default function HomePage() {
         <div className="intro-content">
           <div className="intro-text">
             <h2>Stock Analysis & Prediction</h2>
-            <p>/* Intro text... */</p>
+            <p>
+              Welcome! This project explores five unknown stocks with historical data 
+              from National Bank. We’ll visualize how economic and news events impact 
+              each stock’s prices and volatility, then attempt to predict significant 
+              market movements before they happen.
+            </p>
+            <p>
+              <strong>Phase 1:</strong> Observe trends and identify which stock might 
+              lead the others. <br />
+              <strong>Phase 2:</strong> Develop statistical or ML models to generate 
+              alerts for imminent rises or drops.
+            </p>
           </div>
           <div className="intro-image">
-            <img src="/images/mainpage.jpg" alt="Placeholder" />
+            <img
+              src="/images/mainpage.jpg"
+              alt="Stock analysis illustration"
+            />
           </div>
         </div>
       </section>
 
       <main className="main-content">
         <h1>Select Period & Stocks</h1>
+
         <div className="chart-controls">
+          {/* Period Dropdown */}
           <label>Period:</label>
-          <select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value)}
-          >
+          <select value={period} onChange={(e) => setPeriod(e.target.value)}>
             {periods.map((p) => (
-              <option key={p} value={p}>{p}</option>
+              <option key={p} value={p}>
+                {p}
+              </option>
             ))}
           </select>
 
+          {/* Market Data vs Trade Data Buttons */}
+          <button
+            style={{
+              backgroundColor: dataType === "market" ? "#2f405e" : "",
+              color: dataType === "market" ? "#fff" : "",
+            }}
+            onClick={() => setDataType("market")}
+          >
+            Market Data
+          </button>
+          <button
+            style={{
+              backgroundColor: dataType === "trade" ? "#2f405e" : "",
+              color: dataType === "trade" ? "#fff" : "",
+            }}
+            onClick={() => setDataType("trade")}
+          >
+            Trade Data
+          </button>
+        </div>
+
+        {/* Stock checkboxes */}
+        <div className="chart-controls">
           {stockOptions.map((stock) => (
             <label key={stock}>
               <input
@@ -356,43 +406,8 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Example toggles for which fields to plot */}
-        <div className="chart-controls">
-          <label>
-            <input
-              type="checkbox"
-              checked={plotBidPrice}
-              onChange={() => setPlotBidPrice(!plotBidPrice)}
-            />
-            Bid Price
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={plotAskPrice}
-              onChange={() => setPlotAskPrice(!plotAskPrice)}
-            />
-            Ask Price
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={plotBidVolume}
-              onChange={() => setPlotBidVolume(!plotBidVolume)}
-            />
-            Bid Volume
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={plotAskVolume}
-              onChange={() => setPlotAskVolume(!plotAskVolume)}
-            />
-            Ask Volume
-          </label>
-        </div>
-
-        {chartsData.length > 0 ? (
+        {/* Render a chart for each selected stock */}
+        {chartsData && chartsData.length > 0 ? (
           chartsData.map(({ stock, chartData }) => (
             <StockChart key={stock} stock={stock} chartData={chartData} />
           ))

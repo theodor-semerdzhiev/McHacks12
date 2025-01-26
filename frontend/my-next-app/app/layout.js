@@ -13,7 +13,7 @@ export default function RootLayout({ children }) {
       <body>
         <nav className="navbar">
           <div className="nav-left">
-            <h2 className="site-title">My App Title</h2>
+            <h2 className="site-title">Predictive Optimization Console</h2>
           </div>
           <div className="nav-right">
             {/* Next.js <Link> components: */}
