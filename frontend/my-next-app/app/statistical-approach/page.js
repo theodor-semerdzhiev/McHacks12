@@ -147,19 +147,39 @@ export default function StatisticalApproachPage() {
           <div className="intro-text">
             <h2>Statistical Approach Overview</h2>
             <p>
-              Our statistical methodology involves analyzing price movements,
-              volumes, and correlations across multiple rebalancing iterations
-              to detect patterns and momentum shifts. We leverage pairwise
-              momentum trading strategies and comparative stock analyses to
-              predict market moves.
-            </p>
-            <p>
-              By tracking these rebalancings over many periods, we can explore
-              whether certain intervals consistently exhibit higher profit
-              potential or if correlation networks among stocks evolve over
-              time. Below, you can select periods to load their corresponding
-              charts and then generate an AI summary for deeper insights.
-            </p>
+    <strong>Our momentum-based pairs trading algorithm</strong> is designed to trade two highly correlated stocks by analyzing their momentum trends and adjusting based on real-time correlation data.
+</p>
+
+<p>
+    <strong>Stock Selection and Pairing: </strong> 
+    The algorithm operates with a pool of five correlated stocks, recalculating their correlations every five minutes. It selects the pair with the highest correlation for the next trading interval.
+</p>
+
+<p>
+    <strong>Data Processing: </strong> 
+    High-frequency data was processed and transformed into 5-second intervals to capture detailed price movements and detect momentum changes.
+</p>
+
+<p>
+    <strong>Momentum Calculation and Trading Decisions: </strong> 
+    The algorithm assesses the momentum of the last three data points (15 seconds) to decide whether to long or short the slower-moving stock based on the trend of the faster-moving stock.
+</p>
+
+<p>
+    <strong>Risk Management: </strong> 
+    Dynamic stop losses, momentum thresholds, correlation thresholds, and cooldown periods after consecutive losses are implemented to protect capital and maintain trading stability.
+</p>
+
+<p>
+    <strong>Trading Cycles and Rebalancing: </strong> 
+    Operating across 15 periods, each consisting of 12 rebalancing intervals, the algorithm continuously reassesses and updates the stock pairs to adapt to market conditions.
+</p>
+
+<p>
+    <strong>Results: </strong> 
+    The algorithm performed very well, consistently having positive returns. It is important to note that the end of each interval is defined by a dip in return due to an intentional exit of all positions at the end of the backtesting. Usually, positions that are forcefully exited in this way haven't hit the target price, meaning they are likely losing trades that haven't hit the stop loss yet.
+</p>
+
           </div>
           <div className="intro-image">
             {/* Placeholder image: adjust path if needed */}
