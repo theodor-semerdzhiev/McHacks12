@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy Node.js app to Azure Web App - FastPOCMchacks
 
 on:
@@ -25,6 +28,7 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
+
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
@@ -52,13 +56,13 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-    
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D5A33C195D2D458FAFE94251F84FF3D5 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_68D0EA98C24D4B64803FEFC2E5A2CCAD }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E80980297C744983ADEEE9B26B65BF8D }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B199E7BDA42F402CBD008295781EBBBD }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C77071242FCF401E911D7B45C3839096 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7441461F77CF4F68B51661D2BD432883 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
@@ -67,3 +71,4 @@ jobs:
           app-name: 'FastPOCMchacks'
           slot-name: 'Production'
           package: .
+          
