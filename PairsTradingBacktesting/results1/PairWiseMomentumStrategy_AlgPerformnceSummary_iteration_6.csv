@@ -1,0 +1,13 @@
+,Metric,Value,Additional Info
+0,Total Trades,19.0,19 executed trades
+1,Profitable Trades,13.0,68.4% of total trades
+2,Losing Trades,6.0,31.6% of total trades
+3,Total Profit,4.296999999999969,$4.30
+4,Maximum Investment,30765.0,$30765.00
+5,Average Maximum Investment,30765.0,$30765.00
+6,Return on Investment (ROI),0.013967170485941715,0.01% (based on avg max investment)
+7,Average Profit per Trade,0.22615789473684045,$0.23
+8,Average Winning Trade,0.3377461538461524,$0.34
+9,Average Losing Trade,-0.015616666666668758,$-0.02
+10,Profit Factor,46.85912486658904,46.86x return ratio
+11,Stop Loss Hit Rate,15.789473684210526,15.8% of total trades
