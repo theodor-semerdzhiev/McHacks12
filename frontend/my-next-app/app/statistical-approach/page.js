@@ -184,7 +184,7 @@ export default function StatisticalApproachPage() {
           <div className="intro-image">
             {/* Placeholder image: adjust path if needed */}
             <img
-              src="/images/placeholder_stat_approach.jpg"
+              src="/images/candles.png"
               alt="Statistical approach illustration"
             />
           </div>
