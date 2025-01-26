@@ -1,0 +1,3 @@
+,entry_time,index,type,entry_price,target_price,stop_loss_price,exit_time,exit_price,profit,exit_reason
+0,2025-01-25 10:32:15,1,Long,117.33,117.33427206776017,117.33,2025-01-25 10:32:20,117.35,0.01999999999999602,Target Price Hit
+1,2025-01-25 10:30:20,2,Short,109.85,109.84506411592449,110.39924999999998,2025-01-25 10:35:00,109.88,-0.030000000000001137,End of Backtest Exit
