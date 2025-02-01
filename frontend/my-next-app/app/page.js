@@ -28,8 +28,7 @@ ChartJS.register(
   Tooltip,
   Legend,
   zoomPlugin,
-);
-
+)
 export default function HomePage() {
   // "market" or "trade"
   const [dataType, setDataType] = useState("trade");
@@ -294,92 +293,228 @@ export default function HomePage() {
     return (
       <div style={{ margin: "2rem 0" }}>
         <div style={{ marginBottom: "0.5rem" }}>
-          <button onClick={handleZoomIn}>Zoom In</button>
-          <button onClick={handleZoomOut}>Zoom Out</button>
+          <button onClick={handleZoomIn}>Zoom In</button>{" "}
+          <button onClick={handleZoomOut}>Zoom Out</button>{" "}
           <button onClick={handleResetZoom}>Reset Zoom</button>
         </div>
-        <Line
-          ref={chartRef}
-          data={chartData}
-          options={options}
-          height={400}
-          width={800}
-        />
+        <div style={{ height: "600px" }}>
+          <Line
+            data={chartData}
+            options={options}
+            ref={(chart) => {
+              if (chart) chartRef.current = chart;
+            }}
+          />
+        </div>
       </div>
     );
   }
 
-  return (
-    <div>
-      <h1>Stock Analysis</h1>
-      <div>
-        <h2>Select Data Type</h2>
-        <label>
-          <input
-            type="radio"
-            name="dataType"
-            value="market"
-            checked={dataType === "market"}
-            onChange={() => setDataType("market")}
-          />
-          Market Data
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="dataType"
-            value="trade"
-            checked={dataType === "trade"}
-            onChange={() => setDataType("trade")}
-          />
-          Trade Data
-        </label>
-      </div>
-      <div>
-        <h2>Select Period</h2>
-        {periods.map((p) => (
-          <label key={p}>
-            <input
-              type="radio"
-              name="period"
-              value={p}
-              checked={period === p}
-              onChange={() => setPeriod(p)}
-            />
-            {p}
-          </label>
-        ))}
-      </div>
-      <div>
-        <h2>Select Stocks</h2>
-        {stockOptions.map((stock) => (
-          <label key={stock}>
-            <input
-              type="checkbox"
-              value={stock}
-              checked={selectedStocks.includes(stock)}
-              onChange={(e) => {
-                const updatedStocks = e.target.checked
-                  ? [...selectedStocks, stock]
-                  : selectedStocks.filter((s) => s !== stock);
-                setSelectedStocks(updatedStocks);
-              }}
-            />
-            {stock}
-          </label>
-        ))}
-      </div>
+  // Toggle stock checkboxes
+  const handleStockChange = (stock) => {
+    if (selectedStocks.includes(stock)) {
+      setSelectedStocks(selectedStocks.filter((s) => s !== stock));
+    } else {
+      setSelectedStocks([...selectedStocks, stock]);
+    }
+  };
 
-      <div>
-        <h2>Charts</h2>
-        {chartsData.length > 0 ? (
+  // Editable arrays for analysis
+  const marketAnalysisTexts = [
+    "At 8:30 AM, stocks A B C D E show a noticeable dip, strongly suggest correlation, and a response to a shared external event.",
+    "Stock E and D have similar patterns with drops around 9:50",
+    "Strong growth ",
+    "A wave of volatility hits at 9:15 AM with quick rebounds.",
+    "Market opens with consistent upward trends for stocks A, B, and C.",
+    "Sharp downturn observed for stock A at 10:05 AM, likely triggered by sector news.",
+    "Stocks B and D stabilize around 11:15 AM, showing resilience despite volatility.",
+    "A sudden drop for stock E around 1:30 PM mirrors sector-wide contraction.",
+    "Stocks A and C experience a synchronized rally near 2:45 PM.",
+    "Heavy volatility persists for stock B in the early afternoon.",
+    "Stock D consistently outperforms, unaffected by broader market dips.",
+    "Market-wide stagnation observed during midday, leading to reduced activity.",
+    "Spike in stock A's volume at 10:45 AM hints at significant institutional activity.",
+    "Stock E lags the market during late afternoon rallies.",
+    "Persistent sell-offs observed in stock C during late morning trades.",
+    "Sector divergence emerges around 3:00 PM, isolating stocks A and D.",
+    "Stocks B and E exhibit heightened correlation after 2:00 PM."
+  ];
+
+  const tradeAnalysisTexts = [
+    "At 8:30 AM, stocks A B C D E show a noticeable dip, strongly suggest correlation, and a response to a shared external event.",
+    "Stock E and D opposites, thus disconnect between intentions and actions in market.",
+    "Low-volume lulled periods around midday—re-entry possible.",
+    "Steady buying pressure across stocks A, B, and C during the opening hour.",
+    "Sell-off in stock A at 10:05 AM aligns with macroeconomic announcements.",
+    "Buyers re-enter stock B and D near 11:15 AM as sentiment stabilizes.",
+    "Heavy sell orders dominate stock E around 1:30 PM, pulling it below its moving average.",
+    "Profitable scalping opportunities in stocks A and C during a late-day rally.",
+    "Stock B shows an optimal shorting opportunity amid persistent afternoon volatility.",
+    "Stock D provides a safe long entry amidst market uncertainty.",
+    "Scalping opportunities dry up during a midday lull.",
+    "Sharp increases in volume for stock A at 10:45 AM signal bullish momentum.",
+    "Stock E offers contrarian buying signals in the late afternoon.",
+    "Short positions in stock C profit as sell-offs persist throughout the morning.",
+    "Sector divergence at 3:00 PM highlights stocks A and D as trading opportunities.",
+    "Momentum trading thrives as stocks B and E align post-2:00 PM rally."
+  ];
+
+  return (
+    <>
+      {/* Intro / Hero section */}
+      <section className="intro-section">
+        <div className="intro-content">
+          <div className="intro-text">
+            <h2>Stock Analysis & Prediction</h2>
+            <p>
+              Welcome! This project explores five unknown stocks with historical data
+              from National Bank. We’ll visualize how economic and news events impact
+              each stock’s prices and volatility, then attempt to predict significant
+              market movements before they happen.
+            </p>
+            <p>
+              <strong>Phase 1:</strong> Observe trends and identify which stock might
+              lead the others. <br />
+              <strong>Phase 2:</strong> Develop statistical or ML models to generate
+              alerts for imminent rises or drops.
+            </p>
+          </div>
+          <div className="intro-image">
+            <img src="/images/mainpage.jpg" alt="Stock analysis illustration" />
+          </div>
+        </div>
+      </section>
+
+      {/* Main Chart Visualizer content */}
+      <main className="main-content">
+        <h1>Select Period & Stocks</h1>
+        <div className="chart-controls">
+          <label>Period:</label>
+          <select value={period} onChange={(e) => setPeriod(e.target.value)}>
+            {periods.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
+
+          {/* Market vs Trade buttons */}
+          <button
+            style={{
+              backgroundColor: dataType === "market" ? "#2f405e" : "",
+              color: dataType === "market" ? "#fff" : "",
+            }}
+            onClick={() => setDataType("market")}
+          >
+            Market Data
+          </button>
+          <button
+            style={{
+              backgroundColor: dataType === "trade" ? "#2f405e" : "",
+              color: dataType === "trade" ? "#fff" : "",
+            }}
+            onClick={() => setDataType("trade")}
+          >
+            Trade Data
+          </button>
+        </div>
+
+        {/* Stock checkboxes */}
+        <div className="chart-controls">
+          {stockOptions.map((stock) => (
+            <label key={stock}>
+              <input
+                type="checkbox"
+                checked={selectedStocks.includes(stock)}
+                onChange={() => handleStockChange(stock)}
+              />
+              {stock}
+            </label>
+          ))}
+        </div>
+
+        {/* Render a chart for each selected stock */}
+        {chartsData && chartsData.length > 0 ? (
           chartsData.map(({ stock, chartData }) => (
             <StockChart key={stock} stock={stock} chartData={chartData} />
           ))
         ) : (
-          <p>No charts to display</p>
+          <p>Loading or no data...</p>
         )}
-      </div>
-    </div>
+      </main>
+
+      {/* Analysis Section for 31 Periods */}
+      <section style={{ maxWidth: "1200px", margin: "2rem auto" }}>
+        <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
+          Analysis for All 31 Periods
+        </h2>
+
+        {periods.map((p, idx) => (
+          <div
+            key={p}
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "1rem",
+              marginBottom: "2rem",
+              justifyContent: "space-between",
+            }}
+          >
+            {/* Market Data box */}
+            <div
+              style={{
+                flex: 1,
+                minWidth: "300px",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                padding: "1rem",
+                background: "#fafafa",
+              }}
+            >
+              <h3 style={{ marginTop: 0 }}>{p} - Market Data Analysis</h3>
+              <p>{marketAnalysisTexts[idx]}</p>
+            </div>
+
+            {/* Trade Data box */}
+            <div
+              style={{
+                flex: 1,
+                minWidth: "300px",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                padding: "1rem",
+                background: "#fafafa",
+              }}
+            >
+              <h3 style={{ marginTop: 0 }}>{p} - Trade Data Analysis</h3>
+              <p>{tradeAnalysisTexts[idx]}</p>
+            </div>
+          </div>
+        ))}
+
+        {/* Full-width Conclusion */}
+        <div
+          style={{
+            marginTop: "2rem",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            padding: "1rem",
+            background: "#fafafa",
+          }}
+        >
+          <h2>Overall Conclusion</h2>
+          <p>
+            This section can summarize your key findings across all 31 periods. 
+            For instance, you might note consistent dips around certain times 
+            in multiple stocks, or highlight correlations that could be used in 
+            future ML or statistical models.
+          </p>
+          <p>
+            Adjust this conclusion once you've populated the above analysis 
+            paragraphs with your real data interpretations!
+          </p>
+        </div>
+      </section>
+    </>
   );
 }
