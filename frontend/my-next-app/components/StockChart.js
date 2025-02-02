@@ -10,6 +10,7 @@ import {
     Title,
     Tooltip,
     Legend,
+    BarController,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
@@ -22,6 +23,7 @@ ChartJS.register(
     BarElement,
     PointElement,
     LineElement,
+    BarController,
     Title,
     Tooltip,
     Legend,
