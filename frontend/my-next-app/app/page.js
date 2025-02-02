@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Papa from "papaparse";
-// import axios from "axios";
+import axios from "axios";
 import dynamic from "next/dynamic";
 
 const StockChart = dynamic(() => import("../components/StockChart"), {
