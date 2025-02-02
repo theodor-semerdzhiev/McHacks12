@@ -7,13 +7,16 @@ import os
 training_data = os.listdir("TrainingData")
 if not os.path.exists("TrainingData1"):
     os.mkdir("TrainingData1")
+    
+def list_dir_ignore_hidden(path: str):
+    return [f for f in os.listdir(path) if not f.startswith(".")]
 
 for period in training_data:
-    for folder in os.listdir(os.path.join("TrainingData", period)):
-        stocks = os.listdir(os.path.join("TrainingData", period, folder))
+    for folder in list_dir_ignore_hidden(os.path.join("TrainingData", period)):
+        stocks = list_dir_ignore_hidden(os.path.join("TrainingData", period, folder))
         for stock in stocks:
             # get all the files in the stock folder
-            files = os.listdir(os.path.join("TrainingData", period, folder, stock))
+            files = list_dir_ignore_hidden(os.path.join("TrainingData", period, folder, stock))
             for file in files:
                 # copy the file to the new folder
                 src = os.path.join("TrainingData", period, folder, stock, file)
