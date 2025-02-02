@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Papa from "papaparse";
-import axios from "axios";
+// import axios from "axios";
 import dynamic from "next/dynamic";
 
 const StockChart = dynamic(() => import("../components/StockChart"), {
@@ -42,18 +42,18 @@ export default function HomePage() {
         let allRows = [];
         for (let i = 0; i < chunkFileCount; i++) {
           const csvPath = `/TrainingData/${period}/${period}/${stock}/market_data_${stock}_${i}.csv`;
-          const blobName = `${period}_${stock}_market_data_${i}.csv`;
-          const containerName = "volatility-vision-container";
-          let flag = false;
-          const csv = await axios.get("/api/fetch-blob", {
-             params: { containerName, blobName } 
-            }).catch((err) => { 
-              flag = true;
-              return null;
-            });
+          // const blobName = `${period}_${stock}_market_data_${i}.csv`;
+          // const containerName = "volatility-vision-container";
+          // let flag = false;
+          // const csv = await axios.get("/api/fetch-blob", {
+          //    params: { containerName, blobName } 
+          //   }).catch((err) => { 
+          //     flag = true;
+          //     return null;
+          //   });
 
-          if (flag) break;
-          console.log(csv);
+          // if (flag) break;
+          // console.log(csv);
 
           try {
             const rows = await parseCsv(csvPath);
