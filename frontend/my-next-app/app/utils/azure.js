@@ -4,7 +4,7 @@ import { BlobServiceClient } from "@azure/storage-blob";
 // Function to fetch data from Azure Blob Storage
 export async function fetchBlobData(containerName, blobName) {
   try {
-    const connectionString = "https://volatilityvision.blob.core.windows.net/volatility-vision-container";
+    const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
     const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobClient = containerClient.getBlobClient(blobName);

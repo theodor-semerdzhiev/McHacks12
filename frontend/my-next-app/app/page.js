@@ -16,6 +16,7 @@ import {
 import { Line } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
 import { fetchBlobData } from "./utils/azure";
+import axios from "axios";
 
 // Register Chart.js + Zoom
 ChartJS.register(
@@ -63,7 +64,18 @@ export default function HomePage() {
         for (let i = 0; i < chunkFileCount; i++) {
           const csvPath = `/TrainingData/${period}/${period}/${stock}/market_data_${stock}_${i}.csv`;
           const blobName = `${period}_${stock}_market_data_${i}.csv`;
-          const csv = await fetchBlobData("volatility-vision-container", blobName);
+          const containerName = "volatility-vision-container";
+          let flag = false;
+          const csv = await axios.get("/api/fetch-blob", {
+             params: { containerName, blobName } 
+            }).catch((err) => { 
+              flag = true;
+              return null;
+            });
+
+          if (flag) break;
+          console.log(csv);
+
           try {
             const rows = await parseCsv(csvPath);
             if (rows.length > 0) {

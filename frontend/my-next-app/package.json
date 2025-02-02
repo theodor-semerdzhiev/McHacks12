@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@azure/identity": "^4.6.0",
     "@azure/storage-blob": "^12.26.0",
+    "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "chartjs-plugin-zoom": "^2.2.0",
     "next": "15.1.6",
