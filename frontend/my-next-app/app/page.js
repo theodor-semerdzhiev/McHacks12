@@ -61,7 +61,7 @@ export default function HomePage() {
               allRows = allRows.concat(rows);
             }
           } catch {
-            // 404 or parse error => skip
+            break;
           }
         }
         if (allRows.length === 0) return null;
