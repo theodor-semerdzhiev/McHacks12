@@ -3,7 +3,7 @@
 import "./globals.css"; // Import your global styles
 
 export const metadata = {
-  title: "My Next.js App",
+  title: "Volatility Vision",
   description: "Chart Visualizer, Statistical Approach, ML Approach",
 };
 
