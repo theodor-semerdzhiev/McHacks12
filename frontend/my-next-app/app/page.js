@@ -15,6 +15,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
+// Import the plugin only on the client
 
 // Register Chart.js + Zoom
 ChartJS.register(
@@ -26,7 +27,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  zoomPlugin
+  zoomPlugin,
 );
 
 export default function HomePage() {
