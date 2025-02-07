@@ -180,14 +180,14 @@ button {
 }
 
 button:hover {
-  background-color: #2f405e; /* Slightly lighter blue */
+  background-color: #78a0e6; /* Slightly lighter blue */
   border-color: #a0a4aa; /* Expand gray ring */
   box-shadow: 0 0 10px rgba(160, 164, 170, 0.5);
 }
 
 button:focus {
   outline: none;
-  border-color: #a0a4aa;
+  border-color: #b1c8e9;
   box-shadow: 0 0 5px rgba(160, 164, 170, 0.8);
 }
 
